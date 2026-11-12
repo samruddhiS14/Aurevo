@@ -1,214 +1,424 @@
-# Aurevo
+# Aurevo AI — Intelligent Freelance Project & Payment Platform
 
-Aurevo is an AI-assisted project collaboration and milestone-payment platform with separate Client and Freelancer portals. It uses React + Vite + Tailwind on the frontend and FastAPI + SQLAlchemy + PostgreSQL on the backend. PayPal Sandbox is used for milestone authorization/capture, Gemini supports scope generation and project assistance, and Redis + Celery run persistent reminders and overdue review automation.
+**Build What's Next with PayPal and AI**
 
-## Current feature set
+Aurevo AI is an AI-powered freelance project management platform designed to make collaboration between clients and freelancers more structured, transparent, and secure.
 
-- Separate client and freelancer registration, login, dashboards, and role-checked API access.
-- Project creation, project discovery, freelancer applications, and hiring.
-- Versioned AI scope drafts and agreement routes; the client approves the scope, and both parties must approve the agreement version before milestone payment operations.
-- Milestone deliverable uploads, submissions, review/revision/dispute statuses, audit history, and milestone-level PayPal payment records.
-- PayPal Orders v2 `AUTHORIZE` flow, buyer approval, backend authorization, authorization-expiry tracking, full capture, request-id idempotency, and verified webhook processing.
-- Redis + Celery review reminders and a periodic recovery sweep for the 72-hour automatic review deadline.
-- Project chat, attachment sharing, context-sensitive rule-based off-platform intent detection, and platform-protection warnings. Ordinary mentions of email addresses, dates, Signal, Discord, or Wise do not trigger a warning by themselves.
-- Dispute evidence records, neutral AI evidence summaries, and a mutual-resolution flow requiring both participants to accept.
-- Profile editing, password changes with JWT session-version invalidation, notifications, and completed-project reviews.
-- Currency-safe PayPal quote snapshots: project and agreement amounts remain in their selected currency while PayPal orders, authorizations, captures, and webhook comparisons use the saved USD quote.
-- Agreement approval retry recovery, idempotent milestone generation, and a guarded agreement revision workflow before milestone work or payments begin.
+By combining AI-powered project assistance with PayPal's payment infrastructure, Aurevo helps clients define projects, manage milestones, collaborate with freelancers, and handle milestone-based payments through a streamlined workflow.
 
-## Requirements
+---
 
-- Python 3.11+ (use the version supported by the installed dependency lock/environment).
-- Node.js 20+ and npm.
-- PostgreSQL 14+.
-- Redis 6.2+.
-- PayPal Developer Sandbox application and sandbox buyer/merchant accounts.
-- Gemini API key for AI scope generation, project copilot, AI dispute reports, and semantic chat-intent classification. Rule-based off-platform detection still works without Gemini.
+## About the Project
 
-## Backend setup
+Freelance projects often face challenges such as unclear requirements, communication gaps, scope changes, delayed payments, and a lack of transparency between clients and freelancers.
 
-1. Open a terminal in `backend/`.
-2. Create and activate a virtual environment.
-3. Install dependencies:
+Aurevo AI aims to address these challenges by bringing project intelligence and payment management together in one platform.
 
-   ```bash
-   python -m pip install -r requirements.txt
-   ```
+The platform uses **Artificial Intelligence to assist with project understanding and workflow management**, while **PayPal provides the payment infrastructure for milestone-based transactions**.
 
-4. Create a PostgreSQL database and copy the example environment file:
+Instead of treating project management and payments as separate activities, Aurevo connects them through a unified workflow.
 
-   ```bash
-   cp .env.example .env
-   ```
+## Key Features
 
-5. Set `DATABASE_URL`, `JWT_SECRET_KEY`, `GEMINI_API_KEY`, and the PayPal Sandbox credentials in `backend/.env`. Keep this file private and never commit it.
-6. Start Redis locally. For example, on macOS with Homebrew:
+### 1. AI-Powered Project Assistance
 
-   ```bash
-   brew services start redis
-   ```
+- AI-assisted project scope generation.
+- Helps transform project ideas into more structured requirements.
+- AI-powered project assistance for better project understanding.
+- AI-supported review of submitted work.
+- Helps identify potential scope and policy-related concerns.
 
-7. Apply the database migrations:
+### 2. Project & Freelancer Management
 
-   ```bash
-   alembic upgrade head
-   ```
+- Clients can create and manage projects.
+- Freelancers can explore projects and submit applications.
+- Clients can review applications and select freelancers.
+- Dedicated project workspaces for collaboration.
+- Structured project and milestone tracking.
 
-8. Start the API:
+### 3. PayPal-Powered Milestone Payments
 
-   ```bash
-   uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
-   ```
+- Integration with the PayPal Developer Platform.
+- PayPal Sandbox support for testing transactions.
+- Payment authorization and capture workflows.
+- Milestone-based payment processing.
+- Payment status tracking.
+- Exchange-rate handling for supported currencies.
+- PayPal webhook integration for payment event handling.
 
-   API health: `http://127.0.0.1:8000/health`
+### 4. Transparent Project Workflow
 
-   OpenAPI docs: `http://127.0.0.1:8000/docs`
+- Track project progress through milestones.
+- Monitor payment and milestone statuses.
+- Maintain structured project records.
+- Support communication and collaboration between project participants.
 
-9. In a second backend terminal, start a Celery worker:
+---
 
-   ```bash
-   celery -A app.celery_app:celery_app worker --loglevel=info
-   ```
+## How Aurevo AI Works
 
-10. In a third backend terminal, start Celery Beat:
+1. **Project Creation:** A client creates a project and provides the initial requirements.
+2. **AI Assistance:** AI helps structure the project scope and clarify requirements.
+3. **Freelancer Applications:** Freelancers explore available projects and apply.
+4. **Freelancer Selection:** The client reviews applications and selects a freelancer.
+5. **Project Agreement:** The project moves into a structured workflow with defined milestones.
+6. **Work Submission:** The freelancer works on and submits milestone deliverables.
+7. **AI-Assisted Review:** AI tools assist with reviewing submissions and identifying potential concerns.
+8. **PayPal Payment:** PayPal handles the authorization and capture process for milestone payments.
+9. **Progress Tracking:** Project and payment statuses are updated as milestones progress.
 
-    ```bash
-    celery -A app.celery_app:celery_app beat --loglevel=info
-    ```
+---
 
-The worker and Beat process must remain running for reminders and automatic milestone review/capture. Beat scans every five minutes so missed countdown tasks can be recovered after a Redis/worker interruption.
+## AI Integration
 
-## Frontend setup
+Aurevo uses Google's Gemini AI to provide intelligent assistance throughout the project lifecycle.
 
-1. Open a terminal in `frontend/`.
-2. Install dependencies:
+**AI capabilities include:**
 
-   ```bash
-   npm install
-   ```
+| AI Capability | Purpose |
+|---|---|
+| Scope Generation | Helps convert project descriptions into structured scopes. |
+| Project Copilot | Provides AI-powered assistance for project-related tasks. |
+| Submission Review | Supports AI-assisted evaluation of submitted work. |
+| Policy Detection | Helps identify potential policy-related concerns. |
+| Scope Validation | Helps validate generated project requirements. |
 
-3. Copy `frontend/.env.example` to `frontend/.env` if you need a non-default API URL. The default points to `http://127.0.0.1:8000`.
-4. Start Vite:
+AI is incorporated into the platform's functionality rather than being used only as a conversational interface.
 
-   ```bash
-   npm run dev
-   ```
+**AI Technology:** Google Gemini API
 
-5. Open the local Vite URL printed in the terminal (normally `http://localhost:5173`).
+---
 
-## PayPal Sandbox workflow
+## PayPal Integration
 
-1. Create a Sandbox Business account and a Sandbox Personal account in the PayPal Developer Dashboard.
-2. Create a Sandbox REST app and copy its Client ID and Secret into the backend `.env`.
-3. Register a webhook that points to `/api/payments/webhooks/paypal`. For local development, expose the backend through a secure tunnel and register the public webhook URL. Save the Sandbox webhook ID in `PAYPAL_WEBHOOK_ID`.
-4. The client creates/uses a milestone payment order. The backend creates an Orders v2 order with `intent=AUTHORIZE` and the PayPal buyer approves it.
-5. The backend calls the Orders v2 authorize endpoint and stores the returned authorization ID and actual `expiration_time`.
-6. After client approval, the client can capture the authorization. If the client does not respond to a submitted milestone before its configured deadline, the Celery worker can automatically approve and capture it, provided there is a valid, unexpired authorization and no active dispute/revision state.
-7. PayPal webhook signatures are verified before an event is persisted. Events are idempotently recorded and amount/currency are checked before payment state changes.
+PayPal is a core component of Aurevo's payment workflow.
 
-**Important:** PayPal authorization/capture is not escrow. Aurevo does not hold funds in a regulated escrow account and does not guarantee PayPal approval, capture, refunds, or dispute outcomes. PayPal controls the actual authorization validity, risk checks, and capture result. The platform will not auto-capture if the authorization is missing/expired or if a dispute is active; it records the exception and notifies both parties. PayPal documents an initial three-day honor period and a time-limited authorization window; this implementation tracks the actual `expiration_time` and does not automatically reauthorize an older authorization. If your projects routinely take longer than the initial honor period before submission, add and test a reauthorization workflow before relying on automatic capture.
+The platform integrates the PayPal Developer Platform to support milestone-based payments between clients and freelancers.
 
-The implementation follows PayPal's current Orders v2 `AUTHORIZE` → buyer approval → order authorization → Payments v2 authorization capture sequence. The current PayPal order request uses `payment_source.paypal.experience_context` rather than the deprecated top-level `application_context`. See the official [Orders v2 API](https://developer.paypal.com/docs/api/orders/v2/), [Payments v2 API](https://developer.paypal.com/docs/api/payments/v2/), and [PayPal authorization and honor period guidance](https://developer.paypal.com/payment-methods/auth-honor/). PayPal currently documents a 3-day honor period within a generally 29-day authorization window; capture after the honor period is best-effort and is not guaranteed. Aurevo checks the returned authorization expiry and never assumes capture succeeded without PayPal confirmation.
+**PayPal capabilities used:**
 
-### Currency conversion and quote integrity
+- PayPal REST APIs.
+- Orders API for creating payment orders.
+- Authorization flow for payment authorization.
+- Capture API for capturing authorized payments.
+- Webhooks for receiving payment-related events.
+- PayPal Sandbox for development and testing.
 
-- Frankfurter v2 provides the exchange rate when a non-USD milestone payment is created.
-- The payment row stores the original milestone amount/currency, converted PayPal amount/currency, exchange rate, rate date, source, and fetch timestamp.
-- The same saved quote is reused for order creation, authorization verification, capture, and webhook amount comparisons. A new rate is never fetched during authorization or capture.
-- Legacy USD payment records without quote fields are treated as identity conversions. Legacy non-USD records with an existing PayPal order/authorization but no complete saved quote are moved to reconciliation instead of guessing the amount or currency.
-- A milestone with a payment outcome requiring reconciliation cannot create a second PayPal order until the first outcome is resolved.
+### Payment Workflow
 
-## 72-hour review automation
+1. A payment is initiated for a project milestone.
+2. Aurevo creates a PayPal order.
+3. The client approves the payment through PayPal.
+4. The backend processes the authorization.
+5. Once the milestone is ready for payment capture, Aurevo initiates the capture process.
+6. The backend verifies the returned payment details and updates the payment and milestone records.
 
-Production defaults:
+**Note:** This project currently uses the PayPal Sandbox environment for testing. Sandbox transactions do not represent real-money payments.
 
-```env
-REDIS_URL=redis://localhost:6379/0
-MILESTONE_REVIEW_HOURS=72
-MILESTONE_REMINDER_HOURS=24,48
-MILESTONE_REVIEW_MINUTES=0
-MILESTONE_REMINDER_MINUTES=
-CELERY_TASK_ALWAYS_EAGER=false
+---
+
+## Technology Stack
+
+### Frontend
+
+- React.js
+- Vite
+- JavaScript
+- Tailwind CSS
+
+### Backend
+
+- Python
+- FastAPI
+- SQLAlchemy
+- Alembic
+
+### Artificial Intelligence
+
+- Google Gemini API
+
+### Payment Infrastructure
+
+- PayPal Developer Platform
+- PayPal REST APIs
+- PayPal Webhooks
+
+### Supporting Technologies
+
+- PostgreSQL (database configuration)
+- Redis and Celery (background task infrastructure)
+- Git and GitHub
+
+---
+
+## Project Architecture
+
+```text
+Aurevo_AI/
+│
+├── backend/
+│   ├── app/
+│   │   ├── api/
+│   │   │   └── routes/
+│   │   ├── core/
+│   │   ├── models/
+│   │   ├── schemas/
+│   │   ├── services/
+│   │   └── tasks/
+│   ├── alembic/
+│   ├── tests/
+│   ├── requirements.txt
+│   └── .env.example
+│
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── context/
+│   │   ├── hooks/
+│   │   ├── layouts/
+│   │   ├── pages/
+│   │   └── services/
+│   ├── package.json
+│   └── .env.example
+│
+├── .gitignore
+├── LICENSE
+└── README.md
 ```
 
-The timer starts when a freelancer submits a milestone, not when a project is created. Reminder delivery is deduplicated per milestone submission and offset. The periodic sweep recovers missed reminders and overdue reviews. A revision request or an open dispute stops automatic capture for that submission.
+---
 
-For a quick local test, use a short override in your private `.env`:
+## Getting Started
 
-```env
-MILESTONE_REVIEW_MINUTES=5
-MILESTONE_REMINDER_MINUTES=1,2
+Follow these instructions to run Aurevo AI locally.
+
+### Prerequisites
+
+Install the following:
+
+- Python 3.10 or later
+- Node.js and npm
+- PostgreSQL
+- Redis (if running background task workers)
+- PayPal Developer Sandbox account
+- Google Gemini API key
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/samruddhiS14/Aurevo.git
+cd Aurevo
 ```
 
-Restart the API, worker, and Beat after changing these values. Remove the overrides to return to the 72-hour/24-hour/48-hour production defaults. Do not use the accelerated timer in production.
+### 2. Backend Setup
 
-## AI behaviour and limits
-
-- Scope generation and project copilot use the configured Gemini model.
-- Chat off-platform detection uses explicit, context-sensitive patterns and never blocks or deletes messages. It intentionally ignores bare mentions of channel/provider names, dates, email addresses, or phone numbers unless the message indicates a move to external communication or payment.
-- Gemini requests use a configured HTTP timeout and a bounded retry count. Temporary upstream failures return HTTP 503; invalid generated structured data returns HTTP 502 where applicable.
-- Dispute AI reports summarize supplied text and evidence descriptions. Uploaded file contents are not parsed by the report generator; filenames are never treated as proof of file contents. AI does not decide who is at fault or make payment decisions.
-- AI output is advisory and should be reviewed by the client/freelancer. Approved agreements and recorded project decisions remain the source of truth.
-
-## File handling and production hardening
-
-The API limits project chat and dispute evidence uploads to 10 MB and checks basic file signatures/extensions before storing randomized filenames. Participant-only download routes are enforced. This is not a malware scanner. Before production, add antivirus scanning, storage quotas, object storage with private signed URLs, retention controls, and operational backups.
-
-The current authentication client stores access tokens in `sessionStorage`. For a production deployment, consider an HttpOnly/Secure/SameSite cookie-based session with CSRF protection, stronger rate limiting, audit monitoring, and a formal secret rotation process. These security architecture changes were not silently applied to the existing authentication flow.
-
-## Database migrations
-
-The migration chain after the Phase 5 schema is:
-
-- `c91a4d72f103` — agreement, AI, PayPal, workspace, dispute, review, and reminder schema additions.
-- `d4a9c81e7b20` — adds the `ADMIN` role to the PostgreSQL `user_role` enum.
-- `e71c2a9b4f10` — adds immutable PayPal exchange-rate quote snapshot fields.
-- `f6b2d8c41a90` — adds `users.token_version` for invalidating existing JWTs after password changes or administrator account activation changes.
-
-Before upgrading an existing database, back it up and inspect `alembic current` and `alembic heads`. Do not reset the database or stamp a revision just to bypass a migration error. The historical baseline revision is intentionally empty; an existing database that was never tracked by Alembic needs a deliberate schema/revision reconciliation before running upgrades.
-
-Run:
+Navigate to the backend:
 
 ```bash
 cd backend
-alembic upgrade head
-alembic current
 ```
 
-Back up the database before applying migrations to an existing production database.
-
-## Tests
-
-Run backend tests with:
+Create and activate a virtual environment:
 
 ```bash
-cd backend
-python -m pytest -q
-```
-
-The test suite includes upload signature checks. For full end-to-end verification, test with PostgreSQL, a running Redis worker and Beat, real Gemini credentials, and PayPal Sandbox buyer/merchant accounts. The PayPal external payment flow cannot be considered live-verified until that environment is used.
-
-## Important files
-
-- `backend/app/main.py` — API route registration.
-- `backend/app/services/paypal_service.py` — PayPal REST API client.
-- `backend/app/api/routes/payments.py` — milestone order, authorization, and capture routes.
-- `backend/app/api/routes/paypal_webhooks.py` — webhook verification and state reconciliation.
-- `backend/app/celery_app.py` — Celery worker/Beat configuration.
-- `backend/app/tasks/milestones.py` — review reminders and automatic approval/capture.
-- `backend/app/api/routes/workspace.py` — project chat and off-platform warnings.
-- `backend/app/api/routes/disputes.py` — evidence, AI report, and mutual resolution.
-- `backend/app/api/routes/account.py` — profiles, notifications, password updates, and reviews.
-
-
-## Aurevo administration
-
-The Admin Panel is available at `/admin/login` and `/admin/dashboard`. Admin accounts are not publicly self-registered. After applying the Alembic migration, create the first administrator from the backend directory:
-
-```bash
+python3 -m venv .venv
 source .venv/bin/activate
-alembic upgrade head
-python -m app.scripts.create_admin
 ```
 
-The bootstrap script prompts for the administrator email, name and password. Use a unique password of at least 12 characters. The Admin Panel provides platform monitoring and basic client/freelancer account activation controls. It does not provide payment capture or unilateral dispute-resolution controls.
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Create your local environment file:
+
+```bash
+cp .env.example .env
+```
+
+Configure the required environment variables in `backend/.env`.
+
+### 3. Configure Backend Environment Variables
+
+The backend environment configuration includes:
+
+| Variable | Description |
+|---|---|
+| `DATABASE_URL` | Database connection string |
+| `JWT_SECRET_KEY` | Secret used for authentication tokens |
+| `JWT_ALGORITHM` | JWT signing algorithm |
+| `ACCESS_TOKEN_EXPIRE_MINUTES` | Access token expiration |
+| `GEMINI_API_KEY` | Google Gemini API key |
+| `GEMINI_MODEL` | Gemini model configuration |
+| `PAYPAL_CLIENT_ID` | PayPal Sandbox client ID |
+| `PAYPAL_CLIENT_SECRET` | PayPal Sandbox client secret |
+| `PAYPAL_BASE_URL` | PayPal API base URL |
+| `PAYPAL_WEBHOOK_ID` | PayPal webhook identifier |
+| `PAYPAL_RETURN_URL` | Frontend payment success URL |
+| `PAYPAL_CANCEL_URL` | Frontend payment cancellation URL |
+| `REDIS_URL` | Redis connection URL |
+
+Additional configuration options are documented in `.env.example`.
+
+**Never commit your actual `.env` file, API keys, PayPal credentials, or database passwords.**
+
+### 4. Run Database Migrations
+
+From the backend directory:
+
+```bash
+alembic upgrade head
+```
+
+### 5. Start the Backend Server
+
+```bash
+uvicorn app.main:app --reload --port 8000
+```
+
+Backend API:
+
+```text
+http://127.0.0.1:8000
+```
+
+API documentation:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+### 6. Frontend Setup
+
+Open a new terminal and navigate to the frontend:
+
+```bash
+cd Aurevo/frontend
+```
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Create the frontend environment file:
+
+```bash
+cp .env.example .env
+```
+
+Configure the API URL in the frontend environment file:
+
+```env
+VITE_API_BASE_URL=http://127.0.0.1:8000
+```
+
+Start the frontend:
+
+```bash
+npm run dev
+```
+
+Open the local development URL displayed in your terminal, typically:
+
+```text
+http://localhost:5173
+```
+
+---
+
+## Security & Configuration
+
+Aurevo follows an environment-based configuration approach.
+
+- API credentials are stored in environment variables.
+- Sensitive environment files are excluded through `.gitignore`.
+- Authentication uses JWT-based tokens.
+- PayPal credentials are configured on the backend.
+- Payment processing is handled through backend services.
+- Sandbox credentials should be used for development and testing.
+
+Do not publish real credentials or private transaction information.
+
+---
+
+## Testing
+
+The backend includes tests for core platform functionality and file validation.
+
+Run the tests from the backend directory:
+
+```bash
+pytest
+```
+
+For payment testing, configure PayPal Sandbox credentials and use separate Sandbox buyer and seller accounts.
+
+---
+
+## Hackathon Alignment
+
+Aurevo AI was developed in alignment with the **Build What's Next with PayPal and AI** hackathon challenge.
+
+The project combines two central technologies:
+
+**Artificial Intelligence**
+
+- Google Gemini-powered project assistance.
+- AI-supported project scope generation and validation.
+- AI-assisted submission review and policy detection.
+
+**PayPal**
+
+- PayPal Developer Platform integration.
+- Payment order creation.
+- Authorization and capture workflows.
+- Webhook-based payment event handling.
+
+Together, these technologies create a more intelligent and structured approach to freelance project collaboration and milestone-based payments.
+
+---
+
+## Future Scope
+
+Potential future enhancements include:
+
+- More advanced AI agents for project workflow automation.
+- Improved AI-powered deliverable evaluation.
+- Predictive project risk and delay detection.
+- Automated milestone recommendations.
+- Expanded payment options and currency support.
+- Production deployment with live PayPal integration.
+- Enhanced analytics and reporting.
+
+---
+
+## Project Demo
+
+**Demo Video:** [Add your public YouTube demo link here]
+
+**Live Demo:** [Add your hosted application URL here, if available]
+
+**GitHub Repository:** [https://github.com/samruddhiS14/Aurevo](https://github.com/samruddhiS14/Aurevo)
+
+---
+
+## Team
+
+**Project:** Aurevo AI
+
+**Hackathon:** Build What's Next with PayPal and AI
+
+**Contributors:** Add your team members and their GitHub profiles here.
+
+---
+
+## License
+
+This project is licensed under the MIT License. See the LICENSE file for details.
+
+---
+
+**Aurevo AI — Bringing Intelligence and Trust to Freelance Collaboration.**
