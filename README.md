@@ -399,7 +399,6 @@ Potential future enhancements include:
 
 **Demo Video:** [Add your public YouTube demo link here]
 
-**Live Demo:** [Add your hosted application URL here, if available]
 
 **GitHub Repository:** [https://github.com/samruddhiS14/Aurevo](https://github.com/samruddhiS14/Aurevo)
 
