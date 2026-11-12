@@ -1,0 +1,71 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: "Inter", "Manrope", sans-serif;
+
+  color: #242036;
+  background: #F8F7FC;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+::selection {
+  background: #EAE3FF;
+  color: #5535A5;
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 12px 40px rgba(91, 58, 150, 0.08);
+}
+
+.page-background {
+  background:
+    radial-gradient(
+      circle at 10% 10%,
+      rgba(185, 165, 245, 0.25),
+      transparent 35rem
+    ),
+    radial-gradient(
+      circle at 90% 50%,
+      rgba(234, 227, 255, 0.7),
+      transparent 35rem
+    ),
+    #F8F7FC;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
